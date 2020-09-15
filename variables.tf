@@ -14,8 +14,38 @@
  * limitations under the License.
  */
 
+# TODO: Not all attributes have been implemented
 variable "storage_buckets" {
-  type        = list
+  type = list(object({
+    name = string
+    purpose = string
+    location = string
+    storageClass = string
+    cors = list(object({
+      origin = string
+    }))
+    cdnDomain = string
+    cloudbuildDeployEnabled = bool
+    versioningEnabled = bool
+    versioningRetainDays = number
+    lockRetainDays = number
+    transitionRetainDays = number
+    transitionStorageClass = string
+    autoDeletionRetainDays = number
+    replicationBucket = string
+    backupRetainDays = number
+    backupLocation = string
+    backupLock = bool
+    admins = list(object({
+      id = string
+    }))
+    objectAdmins = list(object({
+      id = string
+    }))
+    objectViewers = list(object({
+      id = string
+    }))
+  }))
   default     = []
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }
