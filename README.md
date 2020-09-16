@@ -33,12 +33,6 @@ storageBuckets:
     storageClass: REGIONAL
     versioningEnabled: true
     versioningRetainDays: 90
-  - name: zone1-projects
-    purpose: projects
-    location: europe-west1
-    storageClass: REGIONAL
-    versioningEnabled: true
-    versioningRetainDays: 90
   - name: zone1-public
     purpose: public
     location: europe-west1
@@ -48,7 +42,9 @@ storageBuckets:
     cors:
       - origin: ["*"]
     cdnDomain: cdn.mydomain.com
-    cloudbuildDeployEnabled: true
+    members:
+      - id: "GCP_PROJECT_NUMBER@cloudbuild.gserviceaccount.com"
+        roles: [ "roles/storage.objectAdmin" ]
   - name: zone1-temp
     purpose: temporary
     location: europe-west1

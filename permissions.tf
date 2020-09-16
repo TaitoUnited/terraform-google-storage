@@ -14,27 +14,11 @@
  * limitations under the License.
  */
 
-locals {
-  storageBuckets = var.storage_buckets
+resource "google_storage_bucket_iam_member" "member" {
+  depends_on    = [google_storage_bucket.bucket]
+  count         = length(local.storageBucketMembers)
 
-  cdnStorageBuckets = flatten([
-    for bucket in local.storageBuckets:
-    try(bucket.cdnDomain, "") != "" ? [ bucket ] : []
-  ])
-
-  storageBucketMembers = flatten([
-    for bucket in local.storageBuckets: [
-      for member in try(bucket.members, []): [
-        for role in try(member.roles, []):
-        {
-          bucket = bucket.name
-          member = member.id
-          role = role
-        }
-      ]
-    ]
-  ])
-}
-
-data "google_project" "project" {
+  bucket        = local.storageBucketMembers[count.index].bucket
+  role          = local.storageBucketMembers[count.index].role
+  member        = local.storageBucketMembers[count.index].member
 }

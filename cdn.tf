@@ -79,12 +79,3 @@ resource "google_storage_bucket_iam_member" "cdn_all_users_viewers" {
   role          = "roles/storage.legacyObjectReader"
   member        = "allUsers"
 }
-
-resource "google_storage_bucket_iam_member" "cdn_cloudbuild_deployer" {
-  depends_on    = [google_storage_bucket.bucket]
-  count         = local.cloudbuildStorageBuckets
-
-  bucket        = local.cloudbuildStorageBuckets[count.index].name
-  role          = "roles/storage.objectAdmin"
-  member        = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
-}

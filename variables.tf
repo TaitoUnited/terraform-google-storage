@@ -25,7 +25,6 @@ variable "storage_buckets" {
       origin = string
     }))
     cdnDomain = string
-    cloudbuildDeployEnabled = bool
     versioningEnabled = bool
     versioningRetainDays = number
     lockRetainDays = number
@@ -36,14 +35,9 @@ variable "storage_buckets" {
     backupRetainDays = number
     backupLocation = string
     backupLock = bool
-    admins = list(object({
+    members = list(object({
       id = string
-    }))
-    objectAdmins = list(object({
-      id = string
-    }))
-    objectViewers = list(object({
-      id = string
+      roles = list(string)
     }))
   }))
   default     = []
