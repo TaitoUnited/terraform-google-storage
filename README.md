@@ -43,8 +43,8 @@ storageBuckets:
       - origin: ["*"]
     cdnDomain: cdn.mydomain.com
     members:
-      - id: "GCP_PROJECT_NUMBER@cloudbuild.gserviceaccount.com"
-        roles: [ "roles/storage.objectAdmin" ]
+      - id: "1234567890@cloudbuild.gserviceaccount.com"
+        roles: [ "roles/storage.objectCreator" ]
   - name: zone1-temp
     purpose: temporary
     location: europe-west1
