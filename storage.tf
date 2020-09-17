@@ -25,14 +25,6 @@ resource "google_storage_bucket" "bucket" {
     purpose   = local.storageBuckets[count.index].purpose
   }
 
-  cors {
-    origin = [
-      for cors in local.storageBuckets[count.index].cors:
-      cors.domain
-    ]
-    method = ["GET"]
-  }
-
   dynamic "cors" {
     for_each = try(local.storageBuckets[count.index].cors, null) != null ? [local.storageBuckets[count.index].cors] : []
     content {

@@ -32,6 +32,25 @@ resource "google_compute_url_map" "cdn_url_map" {
   description     = "CDN URL map to cdn_backend_bucket"
   default_service = google_compute_backend_bucket.cdn_backend_bucket[count.index].self_link
   project         = data.google_project.project.project_id
+
+  header_action {
+    response_headers_to_remove = ["Server", "X-Powered-By"]
+    response_headers_to_add {
+      header_name = "Content-Security-Policy"
+      header_value = "frame-ancestors 'none'"
+      replace = false
+    }
+    response_headers_to_add {
+      header_name = "X-Content-Type-Options"
+      header_value = "nosniff"
+      replace = true
+    }
+    response_headers_to_add {
+      header_name = "Referrer-Policy"
+      header_value = "strict-origin-when-cross-origin"
+      replace = true
+    }
+  }
 }
 
 resource "google_compute_managed_ssl_certificate" "cdn_certificate" {
