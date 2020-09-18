@@ -21,7 +21,7 @@ resource "google_storage_bucket" "bucket" {
   storage_class = local.storageBuckets[count.index].storageClass
 
   labels = {
-    project   = data.google_project.project.project_id
+    project   = var.project_id
     purpose   = local.storageBuckets[count.index].purpose
   }
 

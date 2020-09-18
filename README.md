@@ -31,40 +31,57 @@ storageBuckets:
     location: europe-west1
     storageClass: REGIONAL
     versioningEnabled: true
-    versioningRetainDays: 90
-  - name: zone1-backup
+    versioningRetainDays: 60
+    lockRetainDays:
+    transitionRetainDays:
+    transitionStorageClass:
+    autoDeletionRetainDays:
+    replicationBucket:
+    backupRetainDays:
+    backupLocation:
+    backupLock:
+    cdnDomain:
+    cors:
+    members:
+
+  - name: zone1-locked-backup
     purpose: backup
     location: europe-west1
     storageClass: COLDLINE
-    autoDeletionRetainDays: 100
-    # TIP: You can also use bucket lock:
-    # lockRetainDays: 100
-    # autoDeletionRetainDays: 0
+    versioningEnabled: false
+    versioningRetainDays:
+    lockRetainDays: 100
+    transitionRetainDays:
+    transitionStorageClass:
+    autoDeletionRetainDays: 0
+    replicationBucket:
+    backupRetainDays:
+    backupLocation:
+    backupLock:
+    cdnDomain:
+    cors:
+    members:
+
   - name: zone1-public
     purpose: public
     location: europe-west1
     storageClass: REGIONAL
     versioningEnabled: true
-    versioningRetainDays: 90
+    versioningRetainDays: 60
+    lockRetainDays:
+    transitionRetainDays:
+    transitionStorageClass:
+    autoDeletionRetainDays:
+    replicationBucket:
+    backupRetainDays:
+    backupLocation:
+    backupLock:
+    cdnDomain: cdn.mydomain.com
     cors:
       - origin: ["*"]
-    cdnDomain: cdn.mydomain.com
     members:
       - id: "1234567890@cloudbuild.gserviceaccount.com"
         roles: [ "roles/storage.objectCreator" ]
-  - name: zone1-temp
-    purpose: temporary
-    location: europe-west1
-    storageClass: REGIONAL
-    versioningEnabled: false
-    autoDeletionRetainDays: 90
-  - name: zone1-archive
-    purpose: archive
-    location: europe-west1
-    storageClass: REGIONAL
-    versioningEnabled: true
-    transitionRetainDays: 90
-    transitionStorageClass: ARCHIVE
 ```
 
 Combine with the following modules to get a complete infrastructure defined by YAML:

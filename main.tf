@@ -19,13 +19,13 @@ locals {
 
   cdnStorageBuckets = flatten([
     for bucket in local.storageBuckets:
-    try(bucket.cdnDomain, "") != "" ? [ bucket ] : []
+    bucket.cdnDomain != null && bucket.cdnDomain != "" ? [ bucket ] : []
   ])
 
   storageBucketMembers = flatten([
     for bucket in local.storageBuckets: [
-      for member in try(bucket.members, []): [
-        for role in try(member.roles, []):
+      for member in (bucket.members != null ? bucket.members : []): [
+        for role in try(member.roles != null ? member.roles : []):
         {
           bucket = bucket.name
           member = member.id
@@ -34,7 +34,4 @@ locals {
       ]
     ]
   ])
-}
-
-data "google_project" "project" {
 }

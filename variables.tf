@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+variable "project_id" {
+  type        = string
+}
+
 # TODO: Not all attributes have been implemented
 variable "storage_buckets" {
   type = list(object({
@@ -22,7 +26,7 @@ variable "storage_buckets" {
     location = string
     storageClass = string
     cors = list(object({
-      origin = string
+      origin = list(string)
     }))
     cdnDomain = string
     versioningEnabled = bool
