@@ -16,7 +16,6 @@ resource "google_project_service" "compute" {
 module "storage" {
   source          = "TaitoUnited/storage/google"
   version         = "1.0.0"
-  providers       = [ google ]
   depends_on      = [ google_project_service.compute ]
 
   storage_buckets = yamldecode(file("${path.root}/../infra.yaml"))["storageBuckets"]
@@ -33,6 +32,14 @@ storageBuckets:
     storageClass: REGIONAL
     versioningEnabled: true
     versioningRetainDays: 90
+  - name: zone1-backup
+    purpose: backup
+    location: europe-west1
+    storageClass: COLDLINE
+    autoDeletionRetainDays: 100
+    # TIP: You can also use bucket lock:
+    # lockRetainDays: 100
+    # autoDeletionRetainDays: 0
   - name: zone1-public
     purpose: public
     location: europe-west1
@@ -69,6 +76,7 @@ Combine with the following modules to get a complete infrastructure defined by Y
 - [Databases](https://registry.terraform.io/modules/TaitoUnited/databases/google)
 - [Storage](https://registry.terraform.io/modules/TaitoUnited/storage/google)
 - [Monitoring](https://registry.terraform.io/modules/TaitoUnited/monitoring/google)
+- [Events](https://registry.terraform.io/modules/TaitoUnited/events/google)
 - [PostgreSQL privileges](https://registry.terraform.io/modules/TaitoUnited/privileges/postgresql)
 - [MySQL privileges](https://registry.terraform.io/modules/TaitoUnited/privileges/mysql)
 

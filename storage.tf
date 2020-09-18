@@ -67,6 +67,15 @@ resource "google_storage_bucket" "bucket" {
     }
   }
 
+  # lock
+  dynamic "retention_policy" {
+    for_each = try(local.storageBuckets[count.index].lockRetainDays, null) != null ? [1] : []
+    content {
+      is_locked           = true
+      retention_period    = 60 * 60 * 24 * local.storageBuckets[count.index].lockRetainDays
+    }
+  }
+
   # autoDeletion
   dynamic "lifecycle_rule" {
     for_each = try(local.storageBuckets[count.index].autoDeletionRetainDays, null) != null ? [1] : []
