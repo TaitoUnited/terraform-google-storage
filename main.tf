@@ -27,6 +27,7 @@ locals {
       for member in (bucket.members != null ? bucket.members : []): [
         for role in try(member.roles != null ? member.roles : []):
         {
+          key    = "${bucket.name}-${member.id}-${role}"
           bucket = bucket.name
           member = member.id
           role = role

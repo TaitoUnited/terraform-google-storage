@@ -16,9 +16,9 @@
 
 resource "google_storage_bucket_iam_member" "member" {
   depends_on    = [google_storage_bucket.bucket]
-  count         = length(local.storageBucketMembers)
+  for_each      = {for item in local.storageBucketMembers: item.key => item}
 
-  bucket        = local.storageBucketMembers[count.index].bucket
-  role          = local.storageBucketMembers[count.index].role
-  member        = local.storageBucketMembers[count.index].member
+  bucket        = each.value.bucket
+  role          = each.value.role
+  member        = each.value.member
 }

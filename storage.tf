@@ -15,50 +15,50 @@
 */
 
 resource "google_storage_bucket" "bucket" {
-  count         = length(local.storageBuckets)
-  name          = local.storageBuckets[count.index].name
-  location      = local.storageBuckets[count.index].location
-  storage_class = local.storageBuckets[count.index].storageClass
+  for_each      = {for item in local.storageBuckets: item.name => item}
+  name          = each.value.name
+  location      = each.value.location
+  storage_class = each.value.storageClass
 
   labels = {
     project   = var.project_id
-    purpose   = local.storageBuckets[count.index].purpose
+    purpose   = each.value.purpose
   }
 
   dynamic "cors" {
-    for_each = try(local.storageBuckets[count.index].cors, null) != null ? [local.storageBuckets[count.index].cors] : []
+    for_each = try(each.value.cors, null) != null ? each.value.cors : []
     content {
-      origin = cors.origin
-      method = try(cors.method, ["GET"])
-      response_header = try(cors.responseHeader, ["*"])
-      max_age_seconds = try(cors.maxAgeSeconds, 5)
+      origin = [ cors.value.origin ]
+      method = try(cors.value.method, ["GET"])
+      response_header = try(cors.value.responseHeader, ["*"])
+      max_age_seconds = try(cors.value.maxAgeSeconds, 5)
     }
   }
 
   versioning {
-    enabled = local.storageBuckets[count.index].versioningEnabled
+    enabled = each.value.versioningEnabled
   }
 
   # transition
   dynamic "lifecycle_rule" {
-    for_each = try(local.storageBuckets[count.index].transitionRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.transitionRetainDays, null) != null ? [1] : []
     content {
       condition {
-        age = local.storageBuckets[count.index].transitionRetainDays
+        age = each.value.transitionRetainDays
       }
       action {
         type = "SetStorageClass"
-        storage_class = local.storageBuckets[count.index].transitionStorageClass
+        storage_class = each.value.transitionStorageClass
       }
     }
   }
 
   # versioning
   dynamic "lifecycle_rule" {
-    for_each = try(local.storageBuckets[count.index].versioningRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.versioningRetainDays, null) != null ? [1] : []
     content {
       condition {
-        age = local.storageBuckets[count.index].versioningRetainDays
+        age = each.value.versioningRetainDays
         with_state = "ARCHIVED"
       }
       action {
@@ -69,19 +69,19 @@ resource "google_storage_bucket" "bucket" {
 
   # lock
   dynamic "retention_policy" {
-    for_each = try(local.storageBuckets[count.index].lockRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.lockRetainDays, null) != null ? [1] : []
     content {
       is_locked           = true
-      retention_period    = 60 * 60 * 24 * local.storageBuckets[count.index].lockRetainDays
+      retention_period    = 60 * 60 * 24 * each.value.lockRetainDays
     }
   }
 
   # autoDeletion
   dynamic "lifecycle_rule" {
-    for_each = try(local.storageBuckets[count.index].autoDeletionRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.autoDeletionRetainDays, null) != null ? [1] : []
     content {
       condition {
-        age = local.storageBuckets[count.index].autoDeletionRetainDays
+        age = each.value.autoDeletionRetainDays
         with_state = "ANY"
       }
       action {

@@ -16,21 +16,21 @@
 
 resource "google_compute_backend_bucket" "cdn_backend_bucket" {
   depends_on    = [google_storage_bucket.bucket]
-  count         = length(local.cdnStorageBuckets)
+  for_each      = {for item in local.cdnStorageBuckets: item.name => item}
 
-  name          = "${local.cdnStorageBuckets[count.index].name}-cdn"
+  name          = "${each.value.name}-cdn"
   description   = "Backend bucket for serving static content through CDN"
-  bucket_name   = local.cdnStorageBuckets[count.index].name
+  bucket_name   = each.value.name
   enable_cdn    = true
   project       = var.project_id
 }
 
 resource "google_compute_url_map" "cdn_url_map" {
-  count           = length(local.cdnStorageBuckets)
+  for_each        = {for item in local.cdnStorageBuckets: item.name => item}
 
-  name            = "${local.cdnStorageBuckets[count.index].name}-cdn-url-map"
+  name            = "${each.value.name}-cdn-url-map"
   description     = "CDN URL map to cdn_backend_bucket"
-  default_service = google_compute_backend_bucket.cdn_backend_bucket[count.index].self_link
+  default_service = google_compute_backend_bucket.cdn_backend_bucket[each.key].self_link
   project         = var.project_id
 
   header_action {
@@ -54,47 +54,47 @@ resource "google_compute_url_map" "cdn_url_map" {
 }
 
 resource "google_compute_managed_ssl_certificate" "cdn_certificate" {
-  count           = length(local.cdnStorageBuckets)
+  for_each        = {for item in local.cdnStorageBuckets: item.name => item}
 
   provider        = google-beta
   project         = var.project_id
-  name            = "${local.cdnStorageBuckets[count.index].name}-cdn-certificate"
+  name            = "${each.value.name}-cdn-certificate"
 
   managed {
-    domains = [local.cdnStorageBuckets[count.index].cdnDomain]
+    domains = [each.value.cdnDomain]
   }
 }
 
 resource "google_compute_target_https_proxy" "cdn_https_proxy" {
-  count            = length(local.cdnStorageBuckets)
-  name             = "${local.cdnStorageBuckets[count.index].name}-cdn-https-proxy"
-  url_map          = google_compute_url_map.cdn_url_map[count.index].self_link
-  ssl_certificates = [google_compute_managed_ssl_certificate.cdn_certificate[count.index].self_link]
+  for_each         = {for item in local.cdnStorageBuckets: item.name => item}
+  name             = "${each.value.name}-cdn-https-proxy"
+  url_map          = google_compute_url_map.cdn_url_map[each.key].self_link
+  ssl_certificates = [google_compute_managed_ssl_certificate.cdn_certificate[each.key].self_link]
   project          = var.project_id
 }
 
 resource "google_compute_global_address" "cdn_public_address" {
-  count        = length(local.cdnStorageBuckets)
-  name         = "${local.cdnStorageBuckets[count.index].name}-cdn-public-address"
+  for_each     = {for item in local.cdnStorageBuckets: item.name => item}
+  name         = "${each.value.name}-cdn-public-address"
   ip_version   = "IPV4"
   address_type = "EXTERNAL"
   project      = var.project_id
 }
 
 resource "google_compute_global_forwarding_rule" "cdn_global_forwarding_rule" {
-  count      = length(local.cdnStorageBuckets)
-  name       = "${local.cdnStorageBuckets[count.index].name}-cdn-forwarding-rule"
-  target     = google_compute_target_https_proxy.cdn_https_proxy[count.index].self_link
-  ip_address = google_compute_global_address.cdn_public_address[count.index].address
+  for_each   = {for item in local.cdnStorageBuckets: item.name => item}
+  name       = "${each.value.name}-cdn-forwarding-rule"
+  target     = google_compute_target_https_proxy.cdn_https_proxy[each.key].self_link
+  ip_address = google_compute_global_address.cdn_public_address[each.key].address
   port_range = "443"
   project    = var.project_id
 }
 
 resource "google_storage_bucket_iam_member" "cdn_all_users_viewers" {
   depends_on    = [google_storage_bucket.bucket]
-  count         = length(local.cdnStorageBuckets)
+  for_each      = {for item in local.cdnStorageBuckets: item.name => item}
 
-  bucket        = local.cdnStorageBuckets[count.index].name
+  bucket        = each.value.name
   role          = "roles/storage.legacyObjectReader"
   member        = "allUsers"
 }
