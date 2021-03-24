@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Taito United
+ * Copyright 2021 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ resource "google_storage_bucket" "bucket" {
     for_each = try(each.value.cors, null) != null ? each.value.cors : []
     content {
       origin = [ cors.value.origin ]
-      method = try(cors.value.method, ["GET"])
+      method = try(cors.value.method, ["GET","HEAD"])
       response_header = try(cors.value.responseHeader, ["*"])
       max_age_seconds = try(cors.value.maxAgeSeconds, 5)
     }
