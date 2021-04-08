@@ -26,12 +26,12 @@ resource "google_storage_bucket" "bucket" {
   }
 
   dynamic "cors" {
-    for_each = try(each.value.cors, null) != null ? each.value.cors : []
+    for_each = coalesce(each.value.corsRules, null) != null ? each.value.corsRules : []
     content {
-      origin = [ cors.value.origin ]
-      method = try(cors.value.method, ["GET","HEAD"])
-      response_header = try(cors.value.responseHeader, ["*"])
-      max_age_seconds = try(cors.value.maxAgeSeconds, 5)
+      origin = cors.value.allowedOrigins
+      method = coalesce(cors.value.allowedMethods, ["GET","HEAD"])
+      response_header = coalesce(cors.value.exposeHeaders, ["*"])
+      max_age_seconds = coalesce(cors.value.maxAgeSeconds, 5)
     }
   }
 
@@ -41,7 +41,7 @@ resource "google_storage_bucket" "bucket" {
 
   # transition
   dynamic "lifecycle_rule" {
-    for_each = try(each.value.transitionRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.transitionRetainDays, null) != null ? [1] : []
     content {
       condition {
         age = each.value.transitionRetainDays
@@ -55,7 +55,7 @@ resource "google_storage_bucket" "bucket" {
 
   # versioning
   dynamic "lifecycle_rule" {
-    for_each = try(each.value.versioningRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.versioningRetainDays, null) != null ? [1] : []
     content {
       condition {
         age = each.value.versioningRetainDays
@@ -69,7 +69,7 @@ resource "google_storage_bucket" "bucket" {
 
   # lock
   dynamic "retention_policy" {
-    for_each = try(each.value.lockRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.lockRetainDays, null) != null ? [1] : []
     content {
       is_locked           = true
       retention_period    = 60 * 60 * 24 * each.value.lockRetainDays
@@ -78,7 +78,7 @@ resource "google_storage_bucket" "bucket" {
 
   # autoDeletion
   dynamic "lifecycle_rule" {
-    for_each = try(each.value.autoDeletionRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.autoDeletionRetainDays, null) != null ? [1] : []
     content {
       condition {
         age = each.value.autoDeletionRetainDays

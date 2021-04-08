@@ -22,27 +22,30 @@ variable "project_id" {
 variable "storage_buckets" {
   type = list(object({
     name = string
-    purpose = string
+    purpose = optional(string)
     location = string
     storageClass = string
-    cors = list(object({
-      origin = list(string)
-    }))
-    cdnDomain = string
-    versioningEnabled = bool
-    versioningRetainDays = number
-    lockRetainDays = number
-    transitionRetainDays = number
-    transitionStorageClass = string
-    autoDeletionRetainDays = number
-    replicationBucket = string
-    backupRetainDays = number
-    backupLocation = string
-    backupLock = bool
-    members = list(object({
+    corsRules = optional(list(object({
+      allowedOrigins = list(string)
+      allowedMethods = optional(list(string))
+      exposeHeaders = optional(list(string))
+      maxAgeSeconds = optional(number)
+    })))
+    cdnDomain = optional(string)
+    versioningEnabled = optional(bool)
+    versioningRetainDays = optional(number)
+    lockRetainDays = optional(number)
+    transitionRetainDays = optional(number)
+    transitionStorageClass = optional(string)
+    autoDeletionRetainDays = optional(number)
+    replicationBucket = optional(string)
+    backupRetainDays = optional(number)
+    backupLocation = optional(string)
+    backupLock = optional(bool)
+    members = optional(list(object({
       id = string
-      roles = list(string)
-    }))
+      roles = optional(list(string))
+    })))
   }))
   default     = []
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."

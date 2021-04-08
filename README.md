@@ -78,8 +78,8 @@ storageBuckets:
     backupLocation:
     backupLock:
     cdnDomain: cdn.mydomain.com
-    cors:
-      - origin: ["*"]
+    corsRules:
+      - allowedOrigins: ["*"]
     members:
       - id: "1234567890@cloudbuild.gserviceaccount.com"
         roles: [ "roles/storage.objectCreator" ]
