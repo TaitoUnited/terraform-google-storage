@@ -39,6 +39,14 @@ resource "google_storage_bucket" "bucket" {
     enabled = each.value.versioningEnabled
   }
 
+  hierarchical_namespace {
+    enabled = each.value.hierarchicalNamespaceEnabled
+  }
+
+  uniform_bucket_level_access = each.value.uniformBucketLevelAccessEnabled
+  public_access_prevention = each.value.publicAccessPreventionEnabled ? "enforced" : "inherited"
+
+
   # transition
   dynamic "lifecycle_rule" {
     for_each = each.value.transitionRetainDays != null && each.value.transitionRetainDays != "" ? [1] : []
